@@ -34,6 +34,25 @@ public class DatabaseConnectivity {
         System.out.println("Done");
         String search = "select * from employee_payroll where Employee_Name =?";
         retriveBYName(search);
+        String fromDate = "select * from employee_payroll where Start_Date between ? and ? ";
+        fromPerticularDate(fromDate);
+    }
+
+    private static void fromPerticularDate(String fromDate) throws SQLException {
+        PreparedStatement preparedStatement = con.prepareStatement(fromDate);
+        preparedStatement.setString(1, "15-9-2021");
+        preparedStatement.setString(2, "15-3-2022");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if(resultSet.next())
+        {
+            do{
+                System.out.println(resultSet.getString(1)+","+resultSet.getString(2)+","+resultSet.getString(3)+","+resultSet.getString(4)+","+resultSet.getString(5));
+            }while(resultSet.next());
+        }
+        else
+        {
+            System.out.println("Record Not Found...");
+        }
     }
 
     private static void retriveBYName(String search) throws SQLException {

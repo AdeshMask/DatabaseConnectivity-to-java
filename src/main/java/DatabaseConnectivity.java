@@ -4,23 +4,7 @@ import java.util.Enumeration;
 public class DatabaseConnectivity {
     static Connection con = null;
     public static void main(String[] args) throws SQLException {
-        String jdbcURL = "jdbc:mysql://localhost:3306/Employee_Payroll?useSSL=false";
-        String userName = "root";
-        String password = "Root@123";
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            System.out.println("Driver loaded");
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Cannot find the driver in the calsspath!",e);
-        }
-
-        try {
-            System.out.println("Connecting to database: " + jdbcURL);
-            con = DriverManager.getConnection(jdbcURL, userName, password);
-            System.out.println("Connection is successful!!!!!" + con);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        con = connecingToDatabase();
         listDrivers();
         System.out.println("");
         Statement statement = con.createStatement();
@@ -40,19 +24,19 @@ public class DatabaseConnectivity {
         String maleSum = "SELECT SUM(Salary) FROM employee_payroll WHERE gender = 'M' GROUP BY gender ";
         simpleCalculations(maleSum);
         System.out.print("\nFemale Salary sum:");
-        String feMaleSum = "SELECT SUM(Salary) FROM employee_payroll WHERE gender = 'M' GROUP BY gender ";
+        String feMaleSum = "SELECT SUM(Salary) FROM employee_payroll WHERE gender = 'F' GROUP BY gender ";
         simpleCalculations(feMaleSum);
         System.out.print("\nAverage of male salary:");
         String maleAvg = "select avg(Salary) from employee_payroll where Gender = 'M' group by Gender;";
         simpleCalculations(maleAvg);
         System.out.print("\nAverage of Female salary");
-        String femaleAvg = "select avg(Salary) from employee_payroll where Gender = 'M' group by Gender;";
+        String femaleAvg = "select avg(Salary) from employee_payroll where Gender = 'F' group by Gender;";
         simpleCalculations(femaleAvg);
         System.out.print("\nMin of male salary:");
         String maleMin = "select min(Salary) from employee_payroll where Gender = 'M' group by Gender;";
         simpleCalculations(maleMin);
         System.out.print("\nMax of Female salary");
-        String femaleMax = "select max(Salary) from employee_payroll where Gender = 'M' group by Gender;";
+        String femaleMax = "select max(Salary) from employee_payroll where Gender = 'F' group by Gender;";
         simpleCalculations(femaleMax);
         System.out.print("\nCount of male salary: ");
         String maleCount = "select count(*) from employee_payroll where Gender = 'M'";
@@ -62,16 +46,38 @@ public class DatabaseConnectivity {
         simpleCalculations(femaleCount);
     }
 
-    private static void simpleCalculations(String sum) throws SQLException {
+    public static Connection connecingToDatabase() {
+        String jdbcURL = "jdbc:mysql://localhost:3306/Employee_Payroll?useSSL=false";
+        String userName = "root";
+        String password = "Root@123";
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            System.out.println("Driver loaded");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Cannot find the driver in the calsspath!",e);
+        }
+
+        try {
+            System.out.println("Connecting to database: " + jdbcURL);
+            con = DriverManager.getConnection(jdbcURL, userName, password);
+            System.out.println("Connection is successful!!!!!" + con);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return con;
+    }
+
+    public static String simpleCalculations(String sum) throws SQLException {
         float value = 0.0f;
         PreparedStatement preparedStatement = con.prepareStatement(sum);
         ResultSet resultSet = preparedStatement.executeQuery();
         resultSet.next();
         String result = resultSet.getString(1);
         System.out.print(result);
+        return result;
     }
 
-    private static void fromPerticularDate(String fromDate) throws SQLException {
+    public static String fromPerticularDate(String fromDate) throws SQLException {
         PreparedStatement preparedStatement = con.prepareStatement(fromDate);
         System.out.println("Searching records from particular date:");
         preparedStatement.setString(1, "2021-09-15");
@@ -92,9 +98,10 @@ public class DatabaseConnectivity {
         {
             System.out.println("Record Not Found...");
         }
+        return fromDate;
     }
 
-    private static void retriveBYName(String search) throws SQLException {
+    public static String retriveBYName(String search) throws SQLException {
         PreparedStatement preparedStatement = con.prepareStatement(search);
         preparedStatement.setString(1, "Adesh");
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -109,6 +116,7 @@ public class DatabaseConnectivity {
                     resultSet.getString(13)+" "+resultSet.getString(14)+"\n");
         }
         else System.out.println("Record not Found:");
+        return search;
     }
 
     public static String updateQuery(String updatequery) throws SQLException {
